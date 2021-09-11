@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/parent.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
 
+export 'package:grouped_expansion_tile/parent.dart';
+export 'package:grouped_expansion_tile/group_base.dart';
+
 typedef WidgetBuilder<T extends GroupBase> = Widget Function(
   Parent<T> parent,
   int depth,
