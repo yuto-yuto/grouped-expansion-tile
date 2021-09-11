@@ -16,6 +16,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final ListTileControlAffinity? controlAffinity;
   final EdgeInsetsGeometry? tilePadding;
+  final Function(bool, Parent<T>, int)? onExpansionChanged;
 
   const GroupedExpansionTile({
     required this.data,
@@ -23,6 +24,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     this.padding,
     this.controlAffinity,
     this.tilePadding,
+    this.onExpansionChanged,
     Key? key,
   }) : super(key: key);
 
@@ -57,7 +59,10 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     final leading = children.isEmpty ? const Icon(Icons.remove) : null;
     return ExpansionTile(
       leading: leading,
-      tilePadding: tilePadding ??  EdgeInsets.only(left: depth * 20),
+      onExpansionChanged: (bool expanded) {
+        onExpansionChanged?.call(expanded, parent, depth);
+      },
+      tilePadding: tilePadding ?? EdgeInsets.only(left: depth * 20),
       initiallyExpanded: true,
       title: builder(parent, depth),
       children: children.toList(),
