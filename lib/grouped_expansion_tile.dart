@@ -13,10 +13,16 @@ typedef WidgetBuilder<T extends GroupBase> = Widget Function(
 class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   final Iterable<T> data;
   final WidgetBuilder<T> builder;
+  final EdgeInsetsGeometry? padding;
+  final ListTileControlAffinity? controlAffinity;
+  final EdgeInsetsGeometry? tilePadding;
 
   const GroupedExpansionTile({
     required this.data,
     required this.builder,
+    this.padding,
+    this.controlAffinity,
+    this.tilePadding,
     Key? key,
   }) : super(key: key);
 
@@ -51,11 +57,11 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     final leading = children.isEmpty ? const Icon(Icons.remove) : null;
     return ExpansionTile(
       leading: leading,
-      tilePadding: EdgeInsets.only(left: depth * 20),
+      tilePadding: tilePadding ??  EdgeInsets.only(left: depth * 20),
       initiallyExpanded: true,
       title: builder(parent, depth),
       children: children.toList(),
-      controlAffinity: ListTileControlAffinity.leading,
+      controlAffinity: controlAffinity ?? ListTileControlAffinity.leading,
     );
   }
 
@@ -71,7 +77,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     final expansionTiles = tree.map((e) => _createWidgetTree(e, 0)).toList();
 
     return ListView.separated(
-      padding: const EdgeInsets.all(5),
+      padding: padding ?? const EdgeInsets.all(5),
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemCount: expansionTiles.length,
       itemBuilder: (context, index) => expansionTiles[index],
