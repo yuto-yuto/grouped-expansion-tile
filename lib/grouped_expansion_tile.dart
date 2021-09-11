@@ -53,9 +53,6 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   }
 
   Widget _createWidgetTree(Parent<T> parent, int depth) {
-    final controller = TextEditingController();
-    controller.text = parent.self.name;
-
     final Iterable<Widget> children =
         parent.children?.map((e) => _createWidgetTree(e, depth + 1)) ?? [];
 

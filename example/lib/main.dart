@@ -25,25 +25,23 @@ class Category extends GroupBase {
   final String additional;
   Category({
     required this.additional,
-    uid,
-    name,
-    parent,
-  }) : super(uid: uid, name: name, parent: parent);
+    required String uid,
+    String? parent,
+  }) : super(uid: uid, parent: parent);
 }
-
 
 class GroupedExtensionTileSample extends StatelessWidget {
   const GroupedExtensionTileSample({Key? key}) : super(key: key);
   List<Category> _createList() {
     return [
-      Category(additional: "add", uid: 1, name: "group-1"),
-      Category(additional: "add", uid: 2, name: "group-2"),
-      Category(additional: "add", uid: 3, name: "group-1-1", parent: 1),
-      Category(additional: "add", uid: 4, name: "group-2-1", parent: 2),
-      Category(additional: "add", uid: 5, name: "group-3"),
-      Category(additional: "add", uid: 6, name: "group-2-1-1", parent: 4),
-      Category(additional: "add", uid: 7, name: "group-2-2", parent: 2),
-      Category(additional: "add", uid: 8, name: "group-2-3", parent: 2),
+      Category(additional: "group-1", uid: "1"),
+      Category(additional: "group-2", uid: "2"),
+      Category(additional: "group-1-1", uid: "3", parent: "1"),
+      Category(additional: "group-2-1", uid: "4", parent: "2"),
+      Category(additional: "group-3", uid: "5"),
+      Category(additional: "group-2-1-1", uid: "6", parent: "4"),
+      Category(additional: "group-2-2", uid: "7", parent: "2"),
+      Category(additional: "group-2-3", uid: "8", parent: "2"),
     ];
   }
 
@@ -52,7 +50,7 @@ class GroupedExtensionTileSample extends StatelessWidget {
     final groupedExpansionTile = GroupedExpansionTile<Category>(
       data: _createList(),
       builder: (parent, depth) =>
-          Text("${parent.self.additional}-${parent.self.name}"),
+          Text("${parent.self.additional}-${parent.self.uid}"),
     );
     return SafeArea(
         child: Scaffold(

@@ -1,11 +1,9 @@
 class GroupBase {
-  final int uid;
-  final String name;
-  final int? parent;
+  final String uid;
+  final String? parent;
 
   GroupBase({
     required this.uid,
-    required this.name,
     this.parent,
   });
 }
