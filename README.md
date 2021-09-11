@@ -2,7 +2,7 @@
 
 This widget shows grouped data with expansion tile.
 
-![Example]("./asset/sample-video.gif")
+![Example]("https://github.com/yuto-yuto/grouped-expansion-tile/blob/main/asset/sample-video.gif")
 
 ## Usage
 
