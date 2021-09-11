@@ -72,6 +72,11 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isUnique = data.map((e) => e.uid).toSet().length == data.length;
+    if(!isUnique){
+      throw Exception("List must not contain the same uid.");
+    } 
+
     final topParents = data
         .where((e) => e.parent == null)
         .map((e) => Parent<T>(self: e))
