@@ -34,8 +34,6 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   }) : super(key: key);
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
-    final List<Parent<T>> nextParents = [];
-
     for (final parent in parents) {
       final children = data
           .where((e) => e.parent == parent.self.uid)
@@ -44,12 +42,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
 
       if (children.isNotEmpty) {
         parent.children = children;
-        nextParents.addAll(children);
+        _createItemTree(children);
       }
-    }
-
-    if (nextParents.isNotEmpty) {
-      _createItemTree(nextParents);
     }
     return parents;
   }
@@ -75,9 +69,9 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUnique = data.map((e) => e.uid).toSet().length == data.length;
-    if(!isUnique){
+    if (!isUnique) {
       throw Exception("List must not contain the same uid.");
-    } 
+    }
 
     final topParents = data
         .where((e) => e.parent == null)
