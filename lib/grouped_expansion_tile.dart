@@ -10,7 +10,7 @@ typedef WidgetBuilder<T extends GroupBase> = Widget Function(
   int depth,
 );
 
-class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
+class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
   final Iterable<T> data;
   final WidgetBuilder<T> builder;
 
@@ -20,19 +20,13 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  @override
-  _GroupedExpansionTile<T> createState() => _GroupedExpansionTile<T>();
-}
-
-class _GroupedExpansionTile<T extends GroupBase>
-    extends State<GroupedExpansionTile> {
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     final List<Parent<T>> nextParents = [];
 
     for (final parent in parents) {
-      final children = widget.data
+      final children = data
           .where((e) => e.parent == parent.self.uid)
-          .map((e) => Parent<T>(self: e as T))
+          .map((e) => Parent<T>(self: e))
           .toList();
 
       if (children.isNotEmpty) {
@@ -47,7 +41,7 @@ class _GroupedExpansionTile<T extends GroupBase>
     return parents;
   }
 
-  Widget _createWidgetTree(Parent parent, int depth) {
+  Widget _createWidgetTree(Parent<T> parent, int depth) {
     final controller = TextEditingController();
     controller.text = parent.self.name;
 
@@ -59,7 +53,7 @@ class _GroupedExpansionTile<T extends GroupBase>
       leading: leading,
       tilePadding: EdgeInsets.only(left: depth * 20),
       initiallyExpanded: true,
-      title: widget.builder(parent, depth),
+      title: builder(parent, depth),
       children: children.toList(),
       controlAffinity: ListTileControlAffinity.leading,
     );
@@ -67,7 +61,7 @@ class _GroupedExpansionTile<T extends GroupBase>
 
   @override
   Widget build(BuildContext context) {
-    final topParents = widget.data
+    final topParents = data
         .where((e) => e.parent == null)
         .map((e) => Parent<T>(self: e))
         .toList();
