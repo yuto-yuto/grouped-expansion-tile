@@ -50,7 +50,7 @@ class GroupedExtensionTileSample extends StatelessWidget {
     final groupedExpansionTile = GroupedExpansionTile<Category>(
       data: _createList(),
       builder: (parent, depth) =>
-          Text("${parent.self.additional}-${parent.self.uid}"),
+          Text(parent.self.additional),
     );
     return SafeArea(
         child: Scaffold(
