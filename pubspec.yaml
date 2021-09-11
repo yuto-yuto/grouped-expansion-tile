@@ -1,7 +1,8 @@
 name: grouped_expansion_tile
-description: A new Flutter package project.
-version: 0.0.1
+description: Expansion Tile for grouped data
+version: 1.0.0
 homepage:
+repository: https://github.com/yuto-yuto/grouped-expansion-tile
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

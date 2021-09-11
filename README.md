@@ -4,7 +4,6 @@ This widget shows grouped data with expansion tile.
 
 ![Example](https://user-images.githubusercontent.com/39804422/132948271-21126573-65a2-4d5a-9cec-231cc70c260e.gif)
 
-
 ## Usage
 
 See `/example` folder for the complete sample.
