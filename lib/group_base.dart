@@ -1,4 +1,4 @@
-abstract class GroupBase {
+class GroupBase {
   final int uid;
   final String name;
   final int? parent;
