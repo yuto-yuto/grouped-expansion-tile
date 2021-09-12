@@ -2,7 +2,7 @@
 
 This widget shows grouped data with expansion tile.
 
-![Example](https://user-images.githubusercontent.com/39804422/132948271-21126573-65a2-4d5a-9cec-231cc70c260e.gif)
+![Example](https://user-images.githubusercontent.com/39804422/132971430-d63b97ba-4355-408c-842d-f08688dd4c18.gif)
 
 ## Usage
 
