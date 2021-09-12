@@ -22,7 +22,7 @@ List<GroupBase> _createList() {
   ];
 }
 
-GroupedExpansionTile<Category>(
+GroupedExpansionTile<GroupBase>(
   data: _createList(),
   builder: (parent, depth) => Text(parent.self.name),
 }
