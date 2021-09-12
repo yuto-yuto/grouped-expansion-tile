@@ -1,5 +1,3 @@
-library grouped_expansion_tile;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/parent.dart';
