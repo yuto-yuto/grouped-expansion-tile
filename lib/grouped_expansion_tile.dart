@@ -46,11 +46,34 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     return parents;
   }
 
-  Widget _createWidgetTree(Parent<T> parent, int depth) {
+  Widget _createWidgetTree(BuildContext context, Parent<T> parent, int depth) {
     final Iterable<Widget> children =
-        parent.children?.map((e) => _createWidgetTree(e, depth + 1)) ?? [];
+        parent.children?.map((e) => _createWidgetTree(context, e, depth + 1)) ??
+            [];
 
+    final expansionTile =
+        _createExpansionTile(children.toList(), parent, depth);
+    final feedbackExpansionTile = _createExpansionTile([], parent, depth);
+
+    return Draggable(
+      child: expansionTile,
+      feedback: Material(
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+          child: feedbackExpansionTile,
+        ),
+      ),
+    );
+  }
+
+  ExpansionTile _createExpansionTile(
+    List<Widget> children,
+    Parent<T> parent,
+    int depth,
+  ) {
     final leading = children.isEmpty ? const Icon(Icons.remove) : null;
+
     return ExpansionTile(
       leading: leading,
       onExpansionChanged: (bool expanded) {
@@ -78,7 +101,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
 
     final tree = _createItemTree(topParents);
 
-    final expansionTiles = tree.map((e) => _createWidgetTree(e, 0)).toList();
+    final expansionTiles =
+        tree.map((e) => _createWidgetTree(context, e, 0)).toList();
 
     return ListView.separated(
       padding: padding ?? const EdgeInsets.all(5),

@@ -49,15 +49,15 @@ class GroupedExtensionTileSample extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupedExpansionTile = GroupedExpansionTile<Category>(
       data: _createList(),
-      builder: (parent, depth) =>
-          Text(parent.self.additional),
+      builder: (parent, depth) => Text(parent.self.additional),
     );
     return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        title: const Text("Grouped Extension Sample"),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Grouped Extension Sample"),
+        ),
+        body: groupedExpansionTile,
       ),
-      body: groupedExpansionTile,
-    ));
+    );
   }
 }
