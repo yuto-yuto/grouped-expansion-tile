@@ -37,7 +37,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
-  List<Border> _boders = [];
+  final Map<String, Border> _borders = <String, Border>{};
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
@@ -63,8 +63,11 @@ class _GroupedExpansionTile<T extends GroupBase>
         _createExpansionTile(children.toList(), parent, depth);
     final feedbackExpansionTile = _createExpansionTile([], parent, depth);
 
-    final border = Border.all(color: Colors.transparent, width: 1);
-    _boders.add(border);
+    var border = _borders[parent.self.uid];
+    if (border == null) {
+      border = Border.all(color: Colors.transparent, width: 1);
+      _borders[parent.self.uid] = border;
+    }
 
     final decoratedTile = Container(
       decoration: BoxDecoration(
@@ -77,6 +80,7 @@ class _GroupedExpansionTile<T extends GroupBase>
     );
 
     final draggable = Draggable(
+      data: parent,
       child: decoratedTile,
       feedback: Material(
         child: ConstrainedBox(
@@ -86,11 +90,28 @@ class _GroupedExpansionTile<T extends GroupBase>
         ),
       ),
     );
-    return draggable;
-    // return DragTarget<T>(
-    //   builder: (context, accepted, rejected) => expansionTile,
-    //   onMove: ,
-    // );
+
+    // This is probably not good way.
+    // TODO: Look for a way to update only one widget
+    return DragTarget<Parent<T>>(
+      builder: (context, accepted, rejected) => draggable,
+      onMove: (details) {
+        setState(() {
+          _borders[parent.self.uid] = Border.all(color: Colors.red);
+        });
+      },
+      onLeave: (data) {
+        setState(() {
+          _borders[parent.self.uid] = Border.all(color: Colors.transparent);
+        });
+      },
+      onWillAccept: (data) => data?.self.uid != parent.self.uid,
+      onAccept: (data) {
+        setState(() {
+          _borders[parent.self.uid] = Border.all(color: Colors.transparent);
+        });
+      },
+    );
   }
 
   ExpansionTile _createExpansionTile(
