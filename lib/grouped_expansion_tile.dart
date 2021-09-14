@@ -11,7 +11,7 @@ typedef WidgetBuilder<T extends GroupBase> = Widget Function(
   int depth,
 );
 
-class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
+class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   final Iterable<T> data;
   final WidgetBuilder<T> builder;
   final EdgeInsetsGeometry? padding;
@@ -31,9 +31,17 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  @override
+  _GroupedExpansionTile<T> createState() => _GroupedExpansionTile<T>();
+}
+
+class _GroupedExpansionTile<T extends GroupBase>
+    extends State<GroupedExpansionTile<T>> {
+  List<Border> _boders = [];
+
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
-      final children = data
+      final children = widget.data
           .where((e) => e.parent == parent.self.uid)
           .map((e) => Parent<T>(self: e))
           .toList();
@@ -55,8 +63,21 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
         _createExpansionTile(children.toList(), parent, depth);
     final feedbackExpansionTile = _createExpansionTile([], parent, depth);
 
-    return Draggable(
-      child: expansionTile,
+    final border = Border.all(color: Colors.transparent, width: 1);
+    _boders.add(border);
+
+    final decoratedTile = Container(
+      decoration: BoxDecoration(
+        border: border,
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: expansionTile,
+      ),
+    );
+
+    final draggable = Draggable(
+      child: decoratedTile,
       feedback: Material(
         child: ConstrainedBox(
           constraints:
@@ -65,6 +86,11 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
         ),
       ),
     );
+    return draggable;
+    // return DragTarget<T>(
+    //   builder: (context, accepted, rejected) => expansionTile,
+    //   onMove: ,
+    // );
   }
 
   ExpansionTile _createExpansionTile(
@@ -77,24 +103,26 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
     return ExpansionTile(
       leading: leading,
       onExpansionChanged: (bool expanded) {
-        onExpansionChanged?.call(expanded, parent, depth);
+        widget.onExpansionChanged?.call(expanded, parent, depth);
       },
-      tilePadding: tilePadding ?? EdgeInsets.only(left: depth * 20),
-      initiallyExpanded: initiallyExpanded ?? true,
-      title: builder(parent, depth),
+      tilePadding: widget.tilePadding ?? EdgeInsets.only(left: depth * 20),
+      initiallyExpanded: widget.initiallyExpanded ?? true,
+      title: widget.builder(parent, depth),
       children: children.toList(),
-      controlAffinity: controlAffinity ?? ListTileControlAffinity.leading,
+      controlAffinity:
+          widget.controlAffinity ?? ListTileControlAffinity.leading,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isUnique = data.map((e) => e.uid).toSet().length == data.length;
+    final isUnique =
+        widget.data.map((e) => e.uid).toSet().length == widget.data.length;
     if (!isUnique) {
       throw Exception("List must not contain the same uid.");
     }
 
-    final topParents = data
+    final topParents = widget.data
         .where((e) => e.parent == null)
         .map((e) => Parent<T>(self: e))
         .toList();
@@ -105,7 +133,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatelessWidget {
         tree.map((e) => _createWidgetTree(context, e, 0)).toList();
 
     return ListView.separated(
-      padding: padding ?? const EdgeInsets.all(5),
+      padding: widget.padding ?? const EdgeInsets.all(5),
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemCount: expansionTiles.length,
       itemBuilder: (context, index) => expansionTiles[index],
