@@ -9,6 +9,7 @@ export 'package:grouped_expansion_tile/parent.dart';
 typedef WidgetBuilder<T extends GroupBase> = Widget Function(
   /// Item to show
   Parent<T> parent,
+
   /// To indicate how deep [parent] is.
   /// When it is 0 [parent] is top level item.
   /// When it is 1 [parent] is first level child.
@@ -48,33 +49,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   /// Assigned this value to one of [borders] when a dragged piece is over a widget.
   final Border? highlightedBorder;
 
-  /// Called to determine whether this widget is interested in receiving a given
-  /// piece of data being dragged over this drag target.
-  ///
-  /// Called when a piece of data enters the target. This will be followed by
-  /// either [onAccept] and [onAcceptWithDetails], if the data is dropped, or
-  /// [onLeave], if the drag leaves the target.
-  final DragTargetWillAccept<Parent<T>>? onWillAccept;
-
   /// Called when an acceptable piece of data was dropped over this drag target.
-  ///
-  /// Equivalent to [onAcceptWithDetails], but only includes the data.
   final DragTargetAccept<Parent<T>>? onAccept;
-
-  /// Called when an acceptable piece of data was dropped over this drag target.
-  ///
-  /// Equivalent to [onAccept], but with information, including the data, in a
-  /// [DragTargetDetails].
-  final DragTargetAcceptWithDetails<Parent<T>>? onAcceptWithDetails;
-
-  /// Called when a given piece of data being dragged over this target leaves
-  /// the target.
-  final DragTargetLeave<Parent<T>>? onLeave;
-
-  /// Called when one of [data] moves within other [data].
-  ///
-  /// Note that this includes entering and leaving the target.
-  final DragTargetMove<Parent<T>>? onMove;
 
   const GroupedExpansionTile({
     required this.data,
@@ -86,11 +62,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
     this.initiallyExpanded = true,
     this.initialBorder,
     this.highlightedBorder,
-    this.onWillAccept,
     this.onAccept,
-    this.onAcceptWithDetails,
-    this.onLeave,
-    this.onMove,
     Key? key,
   }) : super(key: key);
 
@@ -176,6 +148,7 @@ class _GroupedExpansionTile<T extends GroupBase>
           _borders[parent.self.uid] =
               widget.initialBorder ?? Border.all(color: Colors.transparent);
         });
+        widget.onAccept?.call(data);
       },
     );
   }
