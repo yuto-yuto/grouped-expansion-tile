@@ -102,7 +102,11 @@ class _GroupedExpansionTile<T extends GroupBase>
 
     final expansionTile =
         _createExpansionTile(children.toList(), parent, depth);
-    final feedbackExpansionTile = _createExpansionTile([], parent, depth);
+    final feedbackExpansionTile = ConstrainedBox(
+      constraints:
+          BoxConstraints(maxWidth: 0.8 * MediaQuery.of(context).size.width),
+      child: _createExpansionTile([], parent, depth),
+    );
 
     final border = _borders[parent.self.uid];
     if (border == null) {
