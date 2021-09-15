@@ -37,7 +37,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   final double childIndent;
 
   /// Called when expansion tile is opened/closed.
-  final Function(bool, Parent<T>, int)? onExpansionChanged;
+  final Function(bool expanded, Parent<T> parent, int depth)? onExpansionChanged;
 
   /// Whether the expansion tile is initially expanded or not
   final bool initiallyExpanded;
@@ -49,8 +49,9 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   /// Assigned this value to one of [borders] when a dragged piece is over a widget.
   final Border? highlightedBorder;
 
-  /// Called when an acceptable piece of data was dropped over this drag target.
-  final DragTargetAccept<Parent<T>>? onAccept;
+  /// Called when an acceptable piece of [source] data was dropped over this
+  /// [destination] target.
+  final Function(Parent<T> source, T destination)? onAccept;
 
   const GroupedExpansionTile({
     required this.data,
@@ -148,7 +149,7 @@ class _GroupedExpansionTile<T extends GroupBase>
           _borders[parent.self.uid] =
               widget.initialBorder ?? Border.all(color: Colors.transparent);
         });
-        widget.onAccept?.call(data);
+        widget.onAccept?.call(data, parent.self);
       },
     );
   }

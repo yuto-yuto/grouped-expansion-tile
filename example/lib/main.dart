@@ -42,22 +42,98 @@ class GroupedExtensionTileSample extends StatelessWidget {
       Category(additional: "group-2-1-1", uid: "6", parent: "4"),
       Category(additional: "group-2-2", uid: "7", parent: "2"),
       Category(additional: "group-2-3", uid: "8", parent: "2"),
+      Category(additional: "group-2-1-1-1", uid: "9", parent: "6"),
+      Category(additional: "group-2-1-1-2", uid: "10", parent: "6"),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final groupedExpansionTile = GroupedExpansionTile<Category>(
-      data: _createList(),
-      builder: (parent, depth) => Text(parent.self.additional),
-    );
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Grouped Extension Sample"),
         ),
-        body: groupedExpansionTile,
+        body: PageView(
+          children: [
+            _createSimplestSample(),
+            _createAdvancedSample(context),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _createSimplestSample() {
+    final groupedExpansionTile = GroupedExpansionTile<Category>(
+      data: _createList(),
+      builder: (parent, depth) => Text(parent.self.additional),
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Simplest"),
+      ),
+      // body: groupedExpansionTile,
+      body: groupedExpansionTile,
+    );
+  }
+
+  Widget _createAdvancedSample(BuildContext context) {
+    final groupedExpansionTile = GroupedExpansionTile<Category>(
+      data: _createList(),
+      builder: (parent, depth) => Text(parent.self.additional),
+      childIndent: 50,
+      controlAffinity: ListTileControlAffinity.trailing,
+      initialBorder: Border.all(color: Colors.orange, width: 1),
+      highlightedBorder:
+          Border.all(color: Colors.deepPurple.shade800, width: 3),
+      initiallyExpanded: false,
+      onAccept: (source, dest) async {
+        final text = 'uid: ${source.self.uid}\n'
+            'additional: ${source.self.additional}\n'
+            'parent: ${source.self.parent}\n\n'
+            'to\n\n'
+            'uid: ${dest.uid}\n'
+            'additional: ${dest.additional}\n'
+            'parent: ${dest.parent}';
+        await _showDialog(context, "onAccept", text);
+      },
+      onExpansionChanged: (expanded, parent, depth) async {
+        final text = "open: $expanded\n parent:$parent\n depth: $depth";
+        await _showDialog(context, "onExpansionChanged", text);
+      },
+      padding: EdgeInsets.zero,
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Advanced"),
+      ),
+      body: groupedExpansionTile,
+    );
+  }
+
+  Future<void> _showDialog(
+    BuildContext context,
+    String title,
+    String text,
+  ) async {
+    final alert = AlertDialog(
+      title: Text(title),
+      content: Text(text),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("OK"),
+        ),
+      ],
+    );
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => alert,
     );
   }
 }
