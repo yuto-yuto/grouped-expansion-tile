@@ -89,6 +89,7 @@ class GroupedExtensionTileSample extends StatelessWidget {
       highlightedBorder:
           Border.all(color: Colors.deepPurple.shade800, width: 3),
       initiallyExpanded: false,
+      draggable: true,
       onAccept: (source, dest) async {
         final text = 'uid: ${source.self.uid}\n'
             'additional: ${source.self.additional}\n'

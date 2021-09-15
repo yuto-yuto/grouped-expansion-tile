@@ -37,7 +37,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   final double childIndent;
 
   /// Called when expansion tile is opened/closed.
-  final Function(bool expanded, Parent<T> parent, int depth)? onExpansionChanged;
+  final Function(bool expanded, Parent<T> parent, int depth)?
+      onExpansionChanged;
 
   /// Whether the expansion tile is initially expanded or not
   final bool initiallyExpanded;
@@ -49,8 +50,11 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   /// Assigned this value to one of [borders] when a dragged piece is over a widget.
   final Border? highlightedBorder;
 
+  /// Enable dragging. This value needs to be set to true when [onAccept] is specified.
+  final bool draggable;
+
   /// Called when an acceptable piece of [source] data was dropped over this
-  /// [destination] target.
+  /// [destination] target. [draggable] must be set to true.
   final Function(Parent<T> source, T destination)? onAccept;
 
   const GroupedExpansionTile({
@@ -64,6 +68,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
     this.initialBorder,
     this.highlightedBorder,
     this.onAccept,
+    this.draggable = false,
     Key? key,
   }) : super(key: key);
 
@@ -114,6 +119,10 @@ class _GroupedExpansionTile<T extends GroupBase>
         child: expansionTile,
       ),
     );
+
+    if (!widget.draggable) {
+      return decoratedTile;
+    }
 
     final draggable = Draggable(
       data: parent,
