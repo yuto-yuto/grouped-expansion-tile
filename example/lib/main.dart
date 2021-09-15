@@ -30,22 +30,46 @@ class Category extends GroupBase {
   }) : super(uid: uid, parent: parent);
 }
 
+List<Category> _createList() {
+  return [
+    Category(additional: "group-1", uid: "1"),
+    Category(additional: "group-2", uid: "2"),
+    Category(additional: "group-1-1", uid: "3", parent: "1"),
+    Category(additional: "group-2-1", uid: "4", parent: "2"),
+    Category(additional: "group-3", uid: "5"),
+    Category(additional: "group-2-1-1", uid: "6", parent: "4"),
+    Category(additional: "group-2-2", uid: "7", parent: "2"),
+    Category(additional: "group-2-3", uid: "8", parent: "2"),
+    Category(additional: "group-2-1-1-1", uid: "9", parent: "6"),
+    Category(additional: "group-2-1-1-2", uid: "10", parent: "6"),
+  ];
+}
+
+Future<void> _showDialog(
+  BuildContext context,
+  String title,
+  String text,
+) async {
+  final alert = AlertDialog(
+    title: Text(title),
+    content: Text(text),
+    actions: [
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text("OK"),
+      ),
+    ],
+  );
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) => alert,
+  );
+}
+
 class GroupedExtensionTileSample extends StatelessWidget {
   const GroupedExtensionTileSample({Key? key}) : super(key: key);
-  List<Category> _createList() {
-    return [
-      Category(additional: "group-1", uid: "1"),
-      Category(additional: "group-2", uid: "2"),
-      Category(additional: "group-1-1", uid: "3", parent: "1"),
-      Category(additional: "group-2-1", uid: "4", parent: "2"),
-      Category(additional: "group-3", uid: "5"),
-      Category(additional: "group-2-1-1", uid: "6", parent: "4"),
-      Category(additional: "group-2-2", uid: "7", parent: "2"),
-      Category(additional: "group-2-3", uid: "8", parent: "2"),
-      Category(additional: "group-2-1-1-1", uid: "9", parent: "6"),
-      Category(additional: "group-2-1-1-2", uid: "10", parent: "6"),
-    ];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +81,7 @@ class GroupedExtensionTileSample extends StatelessWidget {
         body: PageView(
           children: [
             _createSimplestSample(),
-            _createAdvancedSample(context),
+            GroupedExtensionTileSample2(),
           ],
         ),
       ),
@@ -78,10 +102,22 @@ class GroupedExtensionTileSample extends StatelessWidget {
       body: groupedExpansionTile,
     );
   }
+}
 
-  Widget _createAdvancedSample(BuildContext context) {
+class GroupedExtensionTileSample2 extends StatefulWidget {
+  const GroupedExtensionTileSample2({Key? key}) : super(key: key);
+
+  @override
+  _GroupedExtensionTileSample2 createState() => _GroupedExtensionTileSample2();
+}
+
+class _GroupedExtensionTileSample2 extends State<GroupedExtensionTileSample2> {
+  final List<Category> _data = _createList();
+
+  @override
+  Widget build(BuildContext context) {
     final groupedExpansionTile = GroupedExpansionTile<Category>(
-      data: _createList(),
+      data: _data,
       builder: (parent, depth) => Text(parent.self.additional),
       childIndent: 50,
       controlAffinity: ListTileControlAffinity.trailing,
@@ -99,6 +135,10 @@ class GroupedExtensionTileSample extends StatelessWidget {
             'additional: ${dest.additional}\n'
             'parent: ${dest.parent}';
         await _showDialog(context, "onAccept", text);
+
+        setState(() {
+          source.self.parent = dest.uid;
+        });
       },
       onExpansionChanged: (expanded, parent, depth) async {
         final text = "open: $expanded\n parent:$parent\n depth: $depth";
@@ -112,29 +152,6 @@ class GroupedExtensionTileSample extends StatelessWidget {
         title: const Text("Advanced"),
       ),
       body: groupedExpansionTile,
-    );
-  }
-
-  Future<void> _showDialog(
-    BuildContext context,
-    String title,
-    String text,
-  ) async {
-    final alert = AlertDialog(
-      title: Text(title),
-      content: Text(text),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text("OK"),
-        ),
-      ],
-    );
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) => alert,
     );
   }
 }

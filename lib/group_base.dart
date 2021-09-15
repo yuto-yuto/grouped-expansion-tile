@@ -1,6 +1,6 @@
 class GroupBase {
   final String uid;
-  final String? parent;
+  String? parent;
 
   GroupBase({
     required this.uid,
