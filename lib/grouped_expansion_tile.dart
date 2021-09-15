@@ -174,7 +174,7 @@ class _GroupedExpansionTile<T extends GroupBase>
       onAccept: (data) {
         setState(() {
           _borders[parent.self.uid] =
-              widget.highlightedBorder ?? Border.all(color: Colors.red);
+              widget.initialBorder ?? Border.all(color: Colors.transparent);
         });
       },
     );
