@@ -55,7 +55,11 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 
   /// Called when an acceptable piece of [source] data was dropped over this
   /// [destination] target. [draggable] must be set to true.
-  final Function(Parent<T> source, T destination)? onAccept;
+  /// Null [destination] means the source item wants to be top parent.
+  final Function(Parent<T> source, T? destination)? onAccept;
+
+  /// Top parent widget which appears at the top when drag gesture starts.
+  final Widget topParent;
 
   const GroupedExpansionTile({
     required this.data,
@@ -69,6 +73,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
     this.highlightedBorder,
     this.onAccept,
     this.draggable = false,
+    this.topParent = const Text("Top Parent"),
     Key? key,
   }) : super(key: key);
 
@@ -79,6 +84,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
   final Map<String, Border> _borders = <String, Border>{};
+  bool _topParentVisible = false;
+  Border? _parentBorder;
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
@@ -108,21 +115,13 @@ class _GroupedExpansionTile<T extends GroupBase>
       child: _createExpansionTile([], parent, depth),
     );
 
-    final border = _borders[parent.self.uid];
+    var border = _borders[parent.self.uid];
     if (border == null) {
-      _borders[parent.self.uid] =
-          widget.initialBorder ?? Border.all(color: Colors.transparent);
+      _borders[parent.self.uid] = _createInitialBorder();
+      border = _borders[parent.self.uid];
     }
 
-    final decoratedTile = Container(
-      decoration: BoxDecoration(
-        border: border,
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: expansionTile,
-      ),
-    );
+    final decoratedTile = _decorate(expansionTile, border!);
 
     if (!widget.draggable) {
       return decoratedTile;
@@ -138,6 +137,8 @@ class _GroupedExpansionTile<T extends GroupBase>
           child: feedbackExpansionTile,
         ),
       ),
+      onDragStarted: () => setState(() => _topParentVisible = true),
+      onDragEnd: (details) => setState(() => _topParentVisible = false),
     );
 
     // This may not be good way.
@@ -152,18 +153,28 @@ class _GroupedExpansionTile<T extends GroupBase>
       },
       onLeave: (data) {
         setState(() {
-          _borders[parent.self.uid] =
-              widget.initialBorder ?? Border.all(color: Colors.transparent);
+          _borders[parent.self.uid] = _createInitialBorder();
         });
       },
       onWillAccept: (data) => data?.self.uid != parent.self.uid,
       onAccept: (data) {
         setState(() {
-          _borders[parent.self.uid] =
-              widget.initialBorder ?? Border.all(color: Colors.transparent);
+          _borders[parent.self.uid] = _createInitialBorder();
         });
         widget.onAccept?.call(data, parent.self);
       },
+    );
+  }
+
+  Widget _decorate(Widget child, Border border) {
+    return Container(
+      decoration: BoxDecoration(
+        border: border,
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: child,
+      ),
     );
   }
 
@@ -184,6 +195,14 @@ class _GroupedExpansionTile<T extends GroupBase>
         title: widget.builder(parent, depth),
         children: children.toList(),
         controlAffinity: widget.controlAffinity);
+  }
+
+  Border _createInitialBorder() {
+    return widget.initialBorder ?? Border.all(color: Colors.transparent);
+  }
+
+  Border _createHighlightedBorder() {
+    return widget.highlightedBorder ?? Border.all(color: Colors.red);
   }
 
   @override
@@ -207,8 +226,36 @@ class _GroupedExpansionTile<T extends GroupBase>
     return ListView.separated(
       padding: widget.padding,
       separatorBuilder: (context, index) => const SizedBox(height: 10),
-      itemCount: expansionTiles.length,
-      itemBuilder: (context, index) => expansionTiles[index],
+      itemCount: expansionTiles.length + 1,
+      itemBuilder: (context, index) {
+        if (index > 0) {
+          return expansionTiles[index - 1];
+        }
+
+        if (!_topParentVisible) {
+          return const SizedBox.shrink();
+        }
+
+        return DragTarget<Parent<T>>(
+          builder: (context, accepted, rejected) {
+            final child = ListTile(
+              title: Center(child: widget.topParent),
+            );
+            final border = _parentBorder ?? _createInitialBorder();
+            return _decorate(child, border);
+          },
+          onMove: (details) {
+            setState(() => _parentBorder = _createHighlightedBorder());
+          },
+          onLeave: (data) {
+            setState(() => _parentBorder = _createInitialBorder());
+          },
+          onAccept: (data) {
+            setState(() => _parentBorder = _createInitialBorder());
+            widget.onAccept?.call(data, null);
+          },
+        );
+      },
     );
   }
 }

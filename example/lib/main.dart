@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Category extends GroupBase {
-  final String additional;
+  String additional;
   Category({
     required this.additional,
     required String uid,
@@ -127,22 +127,26 @@ class _GroupedExtensionTileSample2 extends State<GroupedExtensionTileSample2> {
       initiallyExpanded: false,
       draggable: true,
       onAccept: (source, dest) async {
-        final text = 'uid: ${source.self.uid}\n'
-            'additional: ${source.self.additional}\n'
-            'parent: ${source.self.parent}\n\n'
-            'to\n\n'
-            'uid: ${dest.uid}\n'
-            'additional: ${dest.additional}\n'
-            'parent: ${dest.parent}';
-        await _showDialog(context, "onAccept", text);
+        // final text = 'uid: ${source.self.uid}\n'
+        //     'additional: ${source.self.additional}\n'
+        //     'parent: ${source.self.parent}\n\n'
+        //     'to\n\n'
+        //     'uid: ${dest?.uid}\n'
+        //     'additional: ${dest?.additional}\n'
+        //     'parent: ${dest?.parent}';
+        // await _showDialog(context, "onAccept", text);
 
         setState(() {
-          source.self.parent = dest.uid;
+          // source is one of elements of _data
+          source.self.parent = dest?.uid;
         });
       },
-      onExpansionChanged: (expanded, parent, depth) async {
-        final text = "open: $expanded\n parent:$parent\n depth: $depth";
-        await _showDialog(context, "onExpansionChanged", text);
+      onExpansionChanged: (expanded, parent, depth) {
+        setState(() {
+          parent.self.additional += "@";
+        });
+        // final text = "open: $expanded\n parent:$parent\n depth: $depth";
+        // await _showDialog(context, "onExpansionChanged", text);
       },
       padding: EdgeInsets.zero,
     );
