@@ -129,16 +129,18 @@ class _GroupedExpansionTile<T extends GroupBase>
       return decoratedTile;
     }
 
+    final feedbackWidget = Material(
+      child: ConstrainedBox(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+        child: feedbackExpansionTile,
+      ),
+    );
+
     final draggable = Draggable(
       data: parent,
       child: decoratedTile,
-      feedback: Material(
-        child: ConstrainedBox(
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-          child: feedbackExpansionTile,
-        ),
-      ),
+      feedback: feedbackWidget,
       onDragStarted: () => setState(() => _topParentVisible = true),
       onDragEnd: (details) => setState(() => _topParentVisible = false),
     );
@@ -147,10 +149,12 @@ class _GroupedExpansionTile<T extends GroupBase>
     // TODO: Look for a way to update only one widget
     return DragTarget<Parent<T>>(
       builder: (context, accepted, rejected) => draggable,
-      onMove: (details) {
+      onMove: (DragTargetDetails<Parent<T>> details) {
         if (!isDifferentGroup(details.data, parent)) {
           return;
         }
+        
+        // details.offset
         setState(() {
           _borders[parent.self.uid] =
               widget.highlightedBorder ?? Border.all(color: Colors.red);
