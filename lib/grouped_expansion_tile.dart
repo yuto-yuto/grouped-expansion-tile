@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
+import 'package:grouped_expansion_tile/group_checker.dart';
 import 'package:grouped_expansion_tile/parent.dart';
 
 export 'package:grouped_expansion_tile/group_base.dart';
@@ -54,8 +55,9 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   final bool draggable;
 
   /// Called when an acceptable piece of [source] data was dropped over this
-  /// [destination] target. [draggable] must be set to true.
+  /// [destination]. [draggable] must be set to true.
   /// Null [destination] means the source item wants to be top parent.
+  /// [source] and [destination] are definitely different group.
   final Function(Parent<T> source, T? destination)? onAccept;
 
   /// Top parent widget which appears at the top when drag gesture starts.
@@ -85,7 +87,7 @@ class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
   final Map<String, Border> _borders = <String, Border>{};
   bool _topParentVisible = false;
-  Border? _parentBorder;
+  Border? _topParentBorder;
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
@@ -146,7 +148,7 @@ class _GroupedExpansionTile<T extends GroupBase>
     return DragTarget<Parent<T>>(
       builder: (context, accepted, rejected) => draggable,
       onMove: (details) {
-        if (!_onWillAccept(details.data, parent)) {
+        if (!isDifferentGroup(details.data, parent)) {
           return;
         }
         setState(() {
@@ -159,7 +161,7 @@ class _GroupedExpansionTile<T extends GroupBase>
           _borders[parent.self.uid] = _createInitialBorder();
         });
       },
-      onWillAccept: (source) => _onWillAccept(source, parent),
+      onWillAccept: (source) => isDifferentGroup(source, parent),
       onAccept: (source) {
         setState(() {
           _borders[parent.self.uid] = _createInitialBorder();
@@ -262,8 +264,8 @@ class _GroupedExpansionTile<T extends GroupBase>
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemCount: expansionTiles.length + 1,
       itemBuilder: (context, index) {
-        if (index > 0) {
-          return expansionTiles[index - 1];
+        if (index != expansionTiles.length) {
+          return expansionTiles[index ];
         }
 
         if (!_topParentVisible) {
@@ -275,17 +277,17 @@ class _GroupedExpansionTile<T extends GroupBase>
             final child = ListTile(
               title: Center(child: widget.topParent),
             );
-            final border = _parentBorder ?? _createInitialBorder();
+            final border = _topParentBorder ?? _createInitialBorder();
             return _decorate(child, border);
           },
           onMove: (details) {
-            setState(() => _parentBorder = _createHighlightedBorder());
+            setState(() => _topParentBorder = _createHighlightedBorder());
           },
           onLeave: (data) {
-            setState(() => _parentBorder = _createInitialBorder());
+            setState(() => _topParentBorder = _createInitialBorder());
           },
           onAccept: (data) {
-            setState(() => _parentBorder = _createInitialBorder());
+            setState(() => _topParentBorder = _createInitialBorder());
             widget.onAccept?.call(data, null);
           },
         );
