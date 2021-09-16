@@ -171,37 +171,6 @@ class _GroupedExpansionTile<T extends GroupBase>
     );
   }
 
-  bool _onWillAccept(Parent<T>? source, Parent<T> dest) {
-    if (source == null) {
-      return false;
-    }
-    if (source.self.uid == dest.self.uid) {
-      return false;
-    }
-    final children = source.children;
-    if (children == null) {
-      return true;
-    }
-    bool isDifferentGroup(Iterable<Parent<T>> list) {
-      final isDifferent =
-          list.every((child) => child.self.uid != dest.self.uid);
-
-      if (!isDifferent) {
-        return false;
-      }
-      final children = list
-          .where((child) => child.children != null)
-          .map((e) => e.children)
-          .expand((element) => element!);
-      if (children.isEmpty) {
-        return true;
-      }
-      return isDifferentGroup(children);
-    }
-
-    return isDifferentGroup(children);
-  }
-
   Widget _decorate(Widget child, Border border) {
     return Container(
       decoration: BoxDecoration(
@@ -265,7 +234,7 @@ class _GroupedExpansionTile<T extends GroupBase>
       itemCount: expansionTiles.length + 1,
       itemBuilder: (context, index) {
         if (index != expansionTiles.length) {
-          return expansionTiles[index ];
+          return expansionTiles[index];
         }
 
         if (!_topParentVisible) {
