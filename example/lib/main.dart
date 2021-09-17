@@ -31,6 +31,9 @@ class Category extends GroupBase {
 }
 
 List<Category> _createList() {
+  final topParents = List.generate(10,
+      (index) => Category(additional: "auto-generated-$index", uid: "2$index"));
+
   return [
     Category(additional: "group-1", uid: "1"),
     Category(additional: "group-2", uid: "2"),
@@ -42,6 +45,7 @@ List<Category> _createList() {
     Category(additional: "group-2-3", uid: "8", parent: "2"),
     Category(additional: "group-2-1-1-1", uid: "9", parent: "6"),
     Category(additional: "group-2-1-1-2", uid: "10", parent: "6"),
+    ...topParents,
   ];
 }
 
