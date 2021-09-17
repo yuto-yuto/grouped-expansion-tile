@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
 import 'package:grouped_expansion_tile/group_checker.dart';
+import 'package:grouped_expansion_tile/highlighted_drag_target.dart';
 import 'package:grouped_expansion_tile/parent.dart';
 
 export 'package:grouped_expansion_tile/group_base.dart';
@@ -114,8 +115,9 @@ class _GroupedExpansionTile<T extends GroupBase>
     final expansionTile =
         _createExpansionTile(children.toList(), parent, depth);
     final feedbackExpansionTile = ConstrainedBox(
-      constraints:
-          BoxConstraints(maxWidth: 0.8 * MediaQuery.of(context).size.width),
+      constraints: BoxConstraints(
+        maxWidth: 0.7 * MediaQuery.of(context).size.width,
+      ),
       child: _createExpansionTile([], parent, depth),
     );
 
@@ -141,45 +143,20 @@ class _GroupedExpansionTile<T extends GroupBase>
 
     final draggable = Draggable(
       data: parent,
-      child: decoratedTile,
+      child: expansionTile,
       feedback: feedbackWidget,
       onDragStarted: () => setState(() => _topParentVisible = true),
       onDragEnd: (details) => setState(() => _topParentVisible = false),
     );
 
-    return _createDragTarget(draggable, parent);
-  }
-
-  Widget _createDragTarget(Widget child, Parent<T> parent) {
-    // This may not be good way.
-    // TODO: Look for a way to update only one widget
-    return DragTarget<Parent<T>>(
-      builder: (context, accepted, rejected) => child,
-      onMove: (DragTargetDetails<Parent<T>> details) {
-        if (!isDifferentGroup(details.data, parent)) {
-          return;
-        }
-
-        setState(() {
-          _borders[parent.self.uid] =
-              widget.highlightedBorder ?? Border.all(color: Colors.red);
-        });
-      },
-      onLeave: (source) {
-        setState(() {
-          _borders[parent.self.uid] = _createInitialBorder();
-        });
-      },
+    return HighlightedDragTarget<T>(
+      child: draggable,
+      parent: parent,
       onWillAccept: (source) => isDifferentGroup(source, parent),
-      onAccept: (source) {
-        setState(() {
-          _borders[parent.self.uid] = _createInitialBorder();
-        });
-        widget.onAccept?.call(source, parent.self);
-      },
+      initialBorder: widget.initialBorder,
+      highlightedBorder: widget.highlightedBorder,
     );
   }
-
   Widget _decorate(Widget child, Border border) {
     return Container(
       decoration: BoxDecoration(
@@ -277,7 +254,8 @@ class _GroupedExpansionTile<T extends GroupBase>
     return Listener(
       child: listView,
       onPointerMove: (PointerMoveEvent event) {
-        RenderBox render = _listViewKey.currentContext?.findRenderObject() as RenderBox;
+        RenderBox render =
+            _listViewKey.currentContext?.findRenderObject() as RenderBox;
         Offset position = render.localToGlobal(Offset.zero);
         double topY = position.dy;
         double bottomY = topY + render.size.height;
