@@ -92,6 +92,12 @@ class _GroupedExpansionTile<T extends GroupBase>
   final ScrollController _scroller = ScrollController();
   final _listViewKey = GlobalKey();
 
+  @override
+  void dispose() {
+    _scroller.dispose();
+    super.dispose();
+  }
+
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
       final children = widget.data
@@ -155,8 +161,10 @@ class _GroupedExpansionTile<T extends GroupBase>
       onWillAccept: (source) => isDifferentGroup(source, parent),
       initialBorder: widget.initialBorder,
       highlightedBorder: widget.highlightedBorder,
+      onAccept: widget.onAccept,
     );
   }
+
   Widget _decorate(Widget child, Border border) {
     return Container(
       decoration: BoxDecoration(
@@ -229,28 +237,25 @@ class _GroupedExpansionTile<T extends GroupBase>
           return const SizedBox.shrink();
         }
 
-        return DragTarget<Parent<T>>(
-          builder: (context, accepted, rejected) {
-            final child = ListTile(
-              title: Center(child: widget.topParent),
-            );
-            final border = _topParentBorder ?? _createInitialBorder();
-            return _decorate(child, border);
-          },
-          onMove: (details) {
-            setState(() => _topParentBorder = _createHighlightedBorder());
-          },
-          onLeave: (data) {
-            setState(() => _topParentBorder = _createInitialBorder());
-          },
-          onAccept: (data) {
-            setState(() => _topParentBorder = _createInitialBorder());
-            widget.onAccept?.call(data, null);
-          },
+        final dragTarget = HighlightedDragTarget<T>(
+          child: ListTile(
+            title: Center(child: widget.topParent),
+          ),
+          parent: null,
+          onWillAccept: (source) => true,
+          initialBorder: widget.initialBorder,
+          highlightedBorder: widget.highlightedBorder,
+          onAccept: widget.onAccept,
+        );
+        return Column(
+          children: [
+            dragTarget,
+            const SizedBox(height: 300),
+          ],
         );
       },
     );
-    // return listView;
+
     return Listener(
       child: listView,
       onPointerMove: (PointerMoveEvent event) {
@@ -262,15 +267,8 @@ class _GroupedExpansionTile<T extends GroupBase>
 
         const detectedRange = 100;
         const moveDistance = 3;
-        print(
-          'now: ${event.position.dy}, '
-          'top: ${topY + detectedRange}, '
-          'bottom: ${bottomY - detectedRange}, '
-          // 'height: ${render.size.height}, '
-          'offset: ${_scroller.offset}',
-        );
+        // TODO: move only while dragging
         if (event.position.dy < topY + detectedRange) {
-          print(" -------  In:  ");
           var to = _scroller.offset - moveDistance;
           to = (to < 0) ? 0 : to;
           _scroller.jumpTo(to);

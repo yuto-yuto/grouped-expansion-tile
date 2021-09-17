@@ -1,18 +1,18 @@
 import 'package:grouped_expansion_tile/grouped_expansion_tile.dart';
 
-bool isDifferentGroup<T extends GroupBase>(Parent<T>? source, Parent<T> dest) {
+bool isDifferentGroup<T extends GroupBase>(Parent<T>? source, Parent<T>? dest) {
   if (source == null) {
     return false;
   }
-  final isSelf = source.self.uid == dest.self.uid;
+  final isSelf = source.self.uid == dest?.self.uid;
   if (isSelf) {
     return false;
   }
-  final hasTheChild = source.self.uid == dest.self.parent;
+  final hasTheChild = source.self.uid == dest?.self.parent;
   if (hasTheChild) {
     return false;
   }
-  final hasTheParent = source.self.parent == dest.self.uid;
+  final hasTheParent = source.self.parent == dest?.self.uid;
   if (hasTheParent) {
     return false;
   }
@@ -23,7 +23,7 @@ bool isDifferentGroup<T extends GroupBase>(Parent<T>? source, Parent<T> dest) {
   }
 
   bool isChildOfChild(Iterable<Parent<T>> list) {
-    final isDifferent = list.every((child) => child.self.uid != dest.self.uid);
+    final isDifferent = list.every((child) => child.self.uid != dest?.self.uid);
 
     if (!isDifferent) {
       return false;
