@@ -88,6 +88,8 @@ class _GroupedExpansionTile<T extends GroupBase>
   final Map<String, Border> _borders = <String, Border>{};
   bool _topParentVisible = false;
   Border? _topParentBorder;
+  final ScrollController _scroller = ScrollController();
+  final _listViewKey = GlobalKey();
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
     for (final parent in parents) {
@@ -145,16 +147,19 @@ class _GroupedExpansionTile<T extends GroupBase>
       onDragEnd: (details) => setState(() => _topParentVisible = false),
     );
 
+    return _createDragTarget(draggable, parent);
+  }
+
+  Widget _createDragTarget(Widget child, Parent<T> parent) {
     // This may not be good way.
     // TODO: Look for a way to update only one widget
     return DragTarget<Parent<T>>(
-      builder: (context, accepted, rejected) => draggable,
+      builder: (context, accepted, rejected) => child,
       onMove: (DragTargetDetails<Parent<T>> details) {
         if (!isDifferentGroup(details.data, parent)) {
           return;
         }
-        
-        // details.offset
+
         setState(() {
           _borders[parent.self.uid] =
               widget.highlightedBorder ?? Border.all(color: Colors.red);
@@ -232,7 +237,9 @@ class _GroupedExpansionTile<T extends GroupBase>
     final expansionTiles =
         tree.map((e) => _createWidgetTree(context, e, 0)).toList();
 
-    return ListView.separated(
+    final listView = ListView.separated(
+      key: _listViewKey,
+      controller: _scroller,
       padding: widget.padding,
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemCount: expansionTiles.length + 1,
@@ -264,6 +271,35 @@ class _GroupedExpansionTile<T extends GroupBase>
             widget.onAccept?.call(data, null);
           },
         );
+      },
+    );
+    // return listView;
+    return Listener(
+      child: listView,
+      onPointerMove: (PointerMoveEvent event) {
+        RenderBox render = _listViewKey.currentContext?.findRenderObject() as RenderBox;
+        Offset position = render.localToGlobal(Offset.zero);
+        double topY = position.dy;
+        double bottomY = topY + render.size.height;
+
+        const detectedRange = 100;
+        const moveDistance = 3;
+        print(
+          'now: ${event.position.dy}, '
+          'top: ${topY + detectedRange}, '
+          'bottom: ${bottomY - detectedRange}, '
+          // 'height: ${render.size.height}, '
+          'offset: ${_scroller.offset}',
+        );
+        if (event.position.dy < topY + detectedRange) {
+          print(" -------  In:  ");
+          var to = _scroller.offset - moveDistance;
+          to = (to < 0) ? 0 : to;
+          _scroller.jumpTo(to);
+        }
+        if (event.position.dy > bottomY - detectedRange) {
+          _scroller.jumpTo(_scroller.offset + moveDistance);
+        }
       },
     );
   }
