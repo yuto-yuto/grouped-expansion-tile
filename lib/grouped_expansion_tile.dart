@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
 import 'package:grouped_expansion_tile/group_checker.dart';
 import 'package:grouped_expansion_tile/highlighted_drag_target.dart';
+import 'package:grouped_expansion_tile/model/top_parent_box_visible.dart';
 import 'package:grouped_expansion_tile/parent.dart';
+import 'package:grouped_expansion_tile/top_parent_box.dart';
+import 'package:provider/provider.dart';
 
 export 'package:grouped_expansion_tile/group_base.dart';
 export 'package:grouped_expansion_tile/parent.dart';
@@ -61,7 +64,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
   /// [source] and [destination] are definitely different group.
   final Function(Parent<T> source, T? destination)? onAccept;
 
-  /// Top parent widget which appears at the top when drag gesture starts.
+  /// Top parent widget which appears at the bottom when drag gesture starts.
   final Widget topParent;
 
   const GroupedExpansionTile({
@@ -87,7 +90,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
   final Map<String, Border> _borders = <String, Border>{};
-  bool _topParentVisible = false;
+  late Notifier<bool> _topParentVisibleNotifier;
   Border? _topParentBorder;
   final ScrollController _scroller = ScrollController();
   final _listViewKey = GlobalKey();
@@ -96,6 +99,11 @@ class _GroupedExpansionTile<T extends GroupBase>
   void dispose() {
     _scroller.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _topParentVisibleNotifier = Notifier(false);
   }
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
@@ -151,8 +159,8 @@ class _GroupedExpansionTile<T extends GroupBase>
       data: parent,
       child: expansionTile,
       feedback: feedbackWidget,
-      // onDragStarted: () => setState(() => _topParentVisible = true),
-      // onDragEnd: (details) => setState(() => _topParentVisible = false),
+      onDragStarted: () => _topParentVisibleNotifier.value = true,
+      onDragEnd: (details) => _topParentVisibleNotifier.value = false,
     );
 
     return HighlightedDragTarget<T>(
@@ -227,36 +235,11 @@ class _GroupedExpansionTile<T extends GroupBase>
       controller: _scroller,
       padding: widget.padding,
       separatorBuilder: (context, index) => const SizedBox(height: 10),
-      itemCount: expansionTiles.length + 1,
-      itemBuilder: (context, index) {
-        if (index != expansionTiles.length) {
-          return expansionTiles[index];
-        }
-
-        if (!_topParentVisible) {
-          return const SizedBox.shrink();
-        }
-
-        final dragTarget = HighlightedDragTarget<T>(
-          child: ListTile(
-            title: Center(child: widget.topParent),
-          ),
-          parent: null,
-          onWillAccept: (source) => true,
-          initialBorder: widget.initialBorder,
-          highlightedBorder: widget.highlightedBorder,
-          onAccept: widget.onAccept,
-        );
-        return Column(
-          children: [
-            dragTarget,
-            const SizedBox(height: 300),
-          ],
-        );
-      },
+      itemCount: expansionTiles.length,
+      itemBuilder: (context, index) => expansionTiles[index],
     );
 
-    return Listener(
+    final listener = Listener(
       child: listView,
       onPointerMove: (PointerMoveEvent event) {
         RenderBox render =
@@ -278,5 +261,21 @@ class _GroupedExpansionTile<T extends GroupBase>
         }
       },
     );
+
+    final topParentBox = TopParentBox(
+      child: widget.topParent,
+      initialBorder: widget.initialBorder,
+      highlightedBorder: widget.highlightedBorder,
+      onAccept: widget.onAccept,
+    );
+
+    final topParentBoxProvider = ChangeNotifierProvider(
+      create: (context) => _topParentVisibleNotifier,
+      builder: (context, widget) => topParentBox,
+    );
+    return Column(children: [
+      Expanded(child: listener),
+      topParentBoxProvider,
+    ]);
   }
 }
