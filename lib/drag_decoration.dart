@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 class DragDecoration extends StatelessWidget {
   final Widget child;
-
   const DragDecoration({
     Key? key,
     required this.child,
@@ -14,17 +13,23 @@ class DragDecoration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<BorderNotifier>(
-      builder: (context, border, child) {
-        return Container(
-          decoration: BoxDecoration(
-            border: border.border,
-          ),
-          child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: this.child,
-          ),
-        );
-      },
+      builder: (context, border, child) => decorateDraggable(
+        context,
+        this.child,
+        border.border,
+      ),
     );
   }
+}
+
+Widget decorateDraggable(BuildContext context, Widget child, Border border) {
+  return Container(
+    decoration: BoxDecoration(
+      border: border,
+    ),
+    child: Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: child,
+    ),
+  );
 }

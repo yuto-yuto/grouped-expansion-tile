@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:grouped_expansion_tile/drag_decoration.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
 import 'package:grouped_expansion_tile/group_checker.dart';
 import 'package:grouped_expansion_tile/highlighted_drag_target.dart';
@@ -89,9 +90,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
-  final Map<String, Border> _borders = <String, Border>{};
   late Notifier<bool> _topParentVisibleNotifier;
-  Border? _topParentBorder;
   final ScrollController _scroller = ScrollController();
   final _listViewKey = GlobalKey();
 
@@ -104,6 +103,7 @@ class _GroupedExpansionTile<T extends GroupBase>
   @override
   void initState() {
     _topParentVisibleNotifier = Notifier(false);
+    super.initState();
   }
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
@@ -135,13 +135,11 @@ class _GroupedExpansionTile<T extends GroupBase>
       child: _createExpansionTile([], parent, depth),
     );
 
-    var border = _borders[parent.self.uid];
-    if (border == null) {
-      _borders[parent.self.uid] = _createInitialBorder();
-      border = _borders[parent.self.uid];
-    }
-
-    final decoratedTile = _decorate(expansionTile, border!);
+    final decoratedTile = decorateDraggable(
+      context,
+      expansionTile,
+      _createInitialBorder(),
+    );
 
     if (!widget.draggable) {
       return decoratedTile;
@@ -173,43 +171,43 @@ class _GroupedExpansionTile<T extends GroupBase>
     );
   }
 
-  Widget _decorate(Widget child, Border border) {
-    return Container(
-      decoration: BoxDecoration(
-        border: border,
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: child,
-      ),
-    );
-  }
-
   ExpansionTile _createExpansionTile(
     List<Widget> children,
     Parent<T> parent,
     int depth,
   ) {
-    final leading = children.isEmpty ? const Icon(Icons.remove) : null;
+    Widget? _buildLeadingIcon() {
+      if (widget.controlAffinity != ListTileControlAffinity.leading ||
+          children.isNotEmpty) {
+        return null;
+      }
+      return const Icon(Icons.remove);
+    }
+
+    Widget? _buildTrailingIcon() {
+      if (widget.controlAffinity == ListTileControlAffinity.leading ||
+          children.isNotEmpty) {
+        return null;
+      }
+      return const Icon(Icons.remove);
+    }
 
     return ExpansionTile(
-        leading: leading,
-        onExpansionChanged: (bool expanded) {
-          widget.onExpansionChanged?.call(expanded, parent, depth);
-        },
-        tilePadding: EdgeInsets.only(left: depth * widget.childIndent),
-        initiallyExpanded: widget.initiallyExpanded,
-        title: widget.builder(parent, depth),
-        children: children.toList(),
-        controlAffinity: widget.controlAffinity);
+      leading: _buildLeadingIcon(),
+      trailing: _buildTrailingIcon(),
+      onExpansionChanged: (bool expanded) {
+        widget.onExpansionChanged?.call(expanded, parent, depth);
+      },
+      tilePadding: EdgeInsets.only(left: depth * widget.childIndent),
+      initiallyExpanded: widget.initiallyExpanded,
+      title: widget.builder(parent, depth),
+      children: children.toList(),
+      controlAffinity: widget.controlAffinity,
+    );
   }
 
   Border _createInitialBorder() {
     return widget.initialBorder ?? Border.all(color: Colors.transparent);
-  }
-
-  Border _createHighlightedBorder() {
-    return widget.highlightedBorder ?? Border.all(color: Colors.red);
   }
 
   @override
