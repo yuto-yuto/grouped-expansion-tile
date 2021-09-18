@@ -233,8 +233,13 @@ class _GroupedExpansionTile<T extends GroupBase>
       controller: _scroller,
       padding: widget.padding,
       separatorBuilder: (context, index) => const SizedBox(height: 10),
-      itemCount: expansionTiles.length,
-      itemBuilder: (context, index) => expansionTiles[index],
+      itemCount: expansionTiles.length + 1,
+      itemBuilder: (context, index) {
+        if (index != expansionTiles.length) {
+          return expansionTiles[index];
+        }
+        return const SizedBox(height: 150);
+      },
     );
 
     final listener = Listener(
@@ -248,7 +253,7 @@ class _GroupedExpansionTile<T extends GroupBase>
 
         const detectedRange = 100;
         const moveDistance = 3;
-        // TODO: move only while dragging
+        // TODO: move only while dragging an item
         if (event.position.dy < topY + detectedRange) {
           var to = _scroller.offset - moveDistance;
           to = (to < 0) ? 0 : to;

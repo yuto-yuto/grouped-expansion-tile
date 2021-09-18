@@ -1,5 +1,7 @@
 import 'package:grouped_expansion_tile/grouped_expansion_tile.dart';
 
+/// Check whether the [source] is different from [dest]. 
+/// It returns false if either [source] or [dest] is null.
 bool isDifferentGroup<T extends GroupBase>(Parent<T>? source, Parent<T>? dest) {
   if (source == null) {
     return false;
