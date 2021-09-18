@@ -155,22 +155,22 @@ class _GroupedExpansionTile<T extends GroupBase>
       ),
     );
 
-    final draggable = Draggable(
-      data: parent,
-      child: expansionTile,
-      feedback: feedbackWidget,
-      onDragStarted: () {
-        _topParentVisibleNotifier.value = true;
-        _draggableNotifier.value = true;
-      },
-      onDragEnd: (details) {
-        _topParentVisibleNotifier.value = false;
-        _draggableNotifier.value = false;
-      },
-    );
+    // final draggable = Draggable(
+    //   data: parent,
+    //   child: expansionTile,
+    //   feedback: feedbackWidget,
+    //   onDragStarted: () {
+    //     _topParentVisibleNotifier.value = true;
+    //     _draggableNotifier.value = true;
+    //   },
+    //   onDragEnd: (details) {
+    //     _topParentVisibleNotifier.value = false;
+    //     _draggableNotifier.value = false;
+    //   },
+    // );
 
     return HighlightedDragTarget<T>(
-      child: draggable,
+      child: expansionTile,
       parent: parent,
       onWillAccept: (source) => isDifferentGroup(source, parent),
       initialBorder: widget.initialBorder,
@@ -184,20 +184,50 @@ class _GroupedExpansionTile<T extends GroupBase>
     Parent<T> parent,
     int depth,
   ) {
-    Widget? _buildLeadingIcon() {
-      if (widget.controlAffinity != ListTileControlAffinity.leading ||
-          children.isNotEmpty) {
+    Widget? _buildDraggableIcon() {
+      if (!widget.draggable) {
         return null;
       }
-      return const Icon(Icons.remove);
+      final feedbackExpansionTile = ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 0.7 * MediaQuery.of(context).size.width,
+        ),
+        child: widget.builder(parent, depth),
+      );
+      final feedbackWidget = Material(
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+          child: feedbackExpansionTile,
+        ),
+      );
+      return Draggable(
+        data: parent,
+        child: const Icon(Icons.dehaze_sharp),
+        feedback: feedbackWidget,
+        onDragStarted: () {
+          _topParentVisibleNotifier.value = true;
+          _draggableNotifier.value = true;
+        },
+        onDragEnd: (details) {
+          _topParentVisibleNotifier.value = false;
+          _draggableNotifier.value = false;
+        },
+      );
+    }
+
+    Widget? _buildLeadingIcon() {
+      if (widget.controlAffinity != ListTileControlAffinity.leading) {
+        return _buildDraggableIcon();
+      }
+      return children.isEmpty ? const Icon(Icons.remove) : null;
     }
 
     Widget? _buildTrailingIcon() {
-      if (widget.controlAffinity == ListTileControlAffinity.leading ||
-          children.isNotEmpty) {
-        return null;
+      if (widget.controlAffinity == ListTileControlAffinity.leading) {
+        return _buildDraggableIcon();
       }
-      return const Icon(Icons.remove);
+      return children.isEmpty ? const Icon(Icons.remove) : null;
     }
 
     return ExpansionTile(
@@ -265,7 +295,7 @@ class _GroupedExpansionTile<T extends GroupBase>
 
           const detectedRange = 100;
           const moveDistance = 3;
-          
+
           if (event.position.dy < topY + detectedRange) {
             var to = _scroller.offset - moveDistance;
             to = (to < 0) ? 0 : to;
