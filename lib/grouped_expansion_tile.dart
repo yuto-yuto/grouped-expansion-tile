@@ -91,6 +91,7 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
   late Notifier<bool> _topParentVisibleNotifier;
+  late Notifier<bool> _draggableNotifier;
   final ScrollController _scroller = ScrollController();
   final _listViewKey = GlobalKey();
 
@@ -103,6 +104,7 @@ class _GroupedExpansionTile<T extends GroupBase>
   @override
   void initState() {
     _topParentVisibleNotifier = Notifier(false);
+    _draggableNotifier = Notifier(false);
     super.initState();
   }
 
@@ -157,8 +159,14 @@ class _GroupedExpansionTile<T extends GroupBase>
       data: parent,
       child: expansionTile,
       feedback: feedbackWidget,
-      onDragStarted: () => _topParentVisibleNotifier.value = true,
-      onDragEnd: (details) => _topParentVisibleNotifier.value = false,
+      onDragStarted: () {
+        _topParentVisibleNotifier.value = true;
+        _draggableNotifier.value = true;
+      },
+      onDragEnd: (details) {
+        _topParentVisibleNotifier.value = false;
+        _draggableNotifier.value = false;
+      },
     );
 
     return HighlightedDragTarget<T>(
@@ -242,27 +250,32 @@ class _GroupedExpansionTile<T extends GroupBase>
       },
     );
 
-    final listener = Listener(
-      child: listView,
-      onPointerMove: (PointerMoveEvent event) {
-        RenderBox render =
-            _listViewKey.currentContext?.findRenderObject() as RenderBox;
-        Offset position = render.localToGlobal(Offset.zero);
-        double topY = position.dy;
-        double bottomY = topY + render.size.height;
+    final listener = Consumer<Notifier<bool>>(
+      builder: (context, idDragging, child) => Listener(
+        child: listView,
+        onPointerMove: (PointerMoveEvent event) {
+          if (!_draggableNotifier.value) {
+            return;
+          }
+          RenderBox render =
+              _listViewKey.currentContext?.findRenderObject() as RenderBox;
+          Offset position = render.localToGlobal(Offset.zero);
+          double topY = position.dy;
+          double bottomY = topY + render.size.height;
 
-        const detectedRange = 100;
-        const moveDistance = 3;
-        // TODO: move only while dragging an item
-        if (event.position.dy < topY + detectedRange) {
-          var to = _scroller.offset - moveDistance;
-          to = (to < 0) ? 0 : to;
-          _scroller.jumpTo(to);
-        }
-        if (event.position.dy > bottomY - detectedRange) {
-          _scroller.jumpTo(_scroller.offset + moveDistance);
-        }
-      },
+          const detectedRange = 100;
+          const moveDistance = 3;
+          
+          if (event.position.dy < topY + detectedRange) {
+            var to = _scroller.offset - moveDistance;
+            to = (to < 0) ? 0 : to;
+            _scroller.jumpTo(to);
+          }
+          if (event.position.dy > bottomY - detectedRange) {
+            _scroller.jumpTo(_scroller.offset + moveDistance);
+          }
+        },
+      ),
     );
 
     final topParentBox = TopParentBox(
@@ -276,9 +289,15 @@ class _GroupedExpansionTile<T extends GroupBase>
       create: (context) => _topParentVisibleNotifier,
       builder: (context, widget) => topParentBox,
     );
-    return Column(children: [
-      Expanded(child: listener),
-      topParentBoxProvider,
-    ]);
+
+    return ChangeNotifierProvider(
+      create: (context) => _draggableNotifier,
+      child: Column(
+        children: [
+          Expanded(child: listener),
+          topParentBoxProvider,
+        ],
+      ),
+    );
   }
 }
