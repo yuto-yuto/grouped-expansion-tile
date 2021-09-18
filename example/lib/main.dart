@@ -85,7 +85,7 @@ class GroupedExtensionTileSample extends StatelessWidget {
         body: PageView(
           children: [
             _createSimplestSample(),
-            GroupedExtensionTileSample2(),
+            const GroupedExtensionTileSample2(),
           ],
         ),
       ),
@@ -131,15 +131,6 @@ class _GroupedExtensionTileSample2 extends State<GroupedExtensionTileSample2> {
       initiallyExpanded: false,
       draggable: true,
       onAccept: (source, dest) async {
-        // final text = 'uid: ${source.self.uid}\n'
-        //     'additional: ${source.self.additional}\n'
-        //     'parent: ${source.self.parent}\n\n'
-        //     'to\n\n'
-        //     'uid: ${dest?.uid}\n'
-        //     'additional: ${dest?.additional}\n'
-        //     'parent: ${dest?.parent}';
-        // await _showDialog(context, "onAccept", text);
-
         setState(() {
           // source is one of elements of _data
           source.self.parent = dest?.uid;
@@ -149,8 +140,6 @@ class _GroupedExtensionTileSample2 extends State<GroupedExtensionTileSample2> {
         setState(() {
           parent.self.additional += "@";
         });
-        // final text = "open: $expanded\n parent:$parent\n depth: $depth";
-        // await _showDialog(context, "onExpansionChanged", text);
       },
       padding: EdgeInsets.zero,
     );
