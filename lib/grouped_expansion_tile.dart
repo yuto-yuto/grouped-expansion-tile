@@ -151,8 +151,8 @@ class _GroupedExpansionTile<T extends GroupBase>
       data: parent,
       child: expansionTile,
       feedback: feedbackWidget,
-      onDragStarted: () => setState(() => _topParentVisible = true),
-      onDragEnd: (details) => setState(() => _topParentVisible = false),
+      // onDragStarted: () => setState(() => _topParentVisible = true),
+      // onDragEnd: (details) => setState(() => _topParentVisible = false),
     );
 
     return HighlightedDragTarget<T>(

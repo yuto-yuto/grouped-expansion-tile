@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/drag_decoration.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
+import 'package:grouped_expansion_tile/model/boder_notifier.dart';
 import 'package:grouped_expansion_tile/parent.dart';
+import 'package:provider/provider.dart';
 
 class HighlightedDragTarget<T extends GroupBase> extends StatefulWidget {
-  // final Border? border;
-
   /// Assigned this value to one of [borders] when a dragged piece leaves a target,
   /// is accepted or rejected.
   final Border? initialBorder;
@@ -31,7 +31,6 @@ class HighlightedDragTarget<T extends GroupBase> extends StatefulWidget {
     required this.parent,
     required this.onWillAccept,
     Key? key,
-    // this.border,
     this.onAccept,
     this.initialBorder,
     this.highlightedBorder,
@@ -42,11 +41,16 @@ class HighlightedDragTarget<T extends GroupBase> extends StatefulWidget {
 
 class _HighlightedDragTarget<T extends GroupBase>
     extends State<HighlightedDragTarget<T>> {
-  Border? _border;
+  late BorderNotifier notifier;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   void initState() {
-    _border = _createInitialBorder();
+    notifier = BorderNotifier(_createInitialBorder());
     super.initState();
   }
 
@@ -60,36 +64,25 @@ class _HighlightedDragTarget<T extends GroupBase>
 
   @override
   Widget build(BuildContext context) {
-    // This may not be good way.
-    // TODO: Look for a way to update only one widget
     final dragTarget = DragTarget<Parent<T>>(
       builder: (context, accepted, rejected) => widget.child,
       onMove: (DragTargetDetails<Parent<T>> details) {
         if (!widget.onWillAccept(details.data)) {
           return;
         }
-
-        // details.offset
-        setState(() {
-          _border = _createHighlightedBorder();
-        });
+        notifier.border = _createHighlightedBorder();
       },
-      onLeave: (source) {
-        setState(() {
-          _border = _createInitialBorder();
-        });
-      },
+      onLeave: (source) => notifier.border = _createInitialBorder(),
       onWillAccept: widget.onWillAccept,
       onAccept: (source) {
-        setState(() {
-          _border = _createInitialBorder();
-        });
+        notifier.border = _createInitialBorder();
         widget.onAccept?.call(source, widget.parent?.self);
       },
     );
-    return DragDecoration(
-      child: dragTarget,
-      border: _border,
+
+    return ChangeNotifierProvider(
+      create: (context) => notifier,
+      child: DragDecoration(child: dragTarget),
     );
   }
 }
