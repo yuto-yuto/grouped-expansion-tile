@@ -130,12 +130,6 @@ class _GroupedExpansionTile<T extends GroupBase>
 
     final expansionTile =
         _createExpansionTile(children.toList(), parent, depth);
-    final feedbackExpansionTile = ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 0.7 * MediaQuery.of(context).size.width,
-      ),
-      child: _createExpansionTile([], parent, depth),
-    );
 
     final decoratedTile = decorateDraggable(
       context,
@@ -146,28 +140,6 @@ class _GroupedExpansionTile<T extends GroupBase>
     if (!widget.draggable) {
       return decoratedTile;
     }
-
-    final feedbackWidget = Material(
-      child: ConstrainedBox(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-        child: feedbackExpansionTile,
-      ),
-    );
-
-    // final draggable = Draggable(
-    //   data: parent,
-    //   child: expansionTile,
-    //   feedback: feedbackWidget,
-    //   onDragStarted: () {
-    //     _topParentVisibleNotifier.value = true;
-    //     _draggableNotifier.value = true;
-    //   },
-    //   onDragEnd: (details) {
-    //     _topParentVisibleNotifier.value = false;
-    //     _draggableNotifier.value = false;
-    //   },
-    // );
 
     return HighlightedDragTarget<T>(
       child: expansionTile,
@@ -188,23 +160,19 @@ class _GroupedExpansionTile<T extends GroupBase>
       if (!widget.draggable) {
         return null;
       }
-      final feedbackExpansionTile = ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 0.7 * MediaQuery.of(context).size.width,
-        ),
-        child: widget.builder(parent, depth),
-      );
-      final feedbackWidget = Material(
+      final feedbackExpansionTile = Material(
         child: ConstrainedBox(
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-          child: feedbackExpansionTile,
+          constraints: BoxConstraints(
+            maxWidth: 0.7 * MediaQuery.of(context).size.width,
+          ),
+          child: widget.builder(parent, depth),
         ),
       );
+      
       return Draggable(
         data: parent,
         child: const Icon(Icons.dehaze_sharp),
-        feedback: feedbackWidget,
+        feedback: feedbackExpansionTile,
         onDragStarted: () {
           _topParentVisibleNotifier.value = true;
           _draggableNotifier.value = true;
