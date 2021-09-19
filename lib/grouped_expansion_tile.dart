@@ -91,8 +91,8 @@ class GroupedExpansionTile<T extends GroupBase> extends StatefulWidget {
 
 class _GroupedExpansionTile<T extends GroupBase>
     extends State<GroupedExpansionTile<T>> {
-  late Notifier<bool> _topParentVisibleNotifier;
-  late Notifier<bool> _draggableNotifier;
+  final Notifier<bool> _topParentVisibleNotifier = Notifier(false);
+  final Notifier<bool> _draggableNotifier = Notifier(false);
   final ScrollController _scroller = ScrollController();
   final _listViewKey = GlobalKey();
 
@@ -100,13 +100,6 @@ class _GroupedExpansionTile<T extends GroupBase>
   void dispose() {
     _scroller.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    _topParentVisibleNotifier = Notifier(false);
-    _draggableNotifier = Notifier(false);
-    super.initState();
   }
 
   List<Parent<T>> _createItemTree(List<Parent<T>> parents) {
