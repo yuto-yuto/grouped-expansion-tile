@@ -2,9 +2,9 @@
 
 This widget shows grouped data with expansion tile.
 
-![Example](https://user-images.githubusercontent.com/39804422/132971430-d63b97ba-4355-408c-842d-f08688dd4c18.gif)
+![Example](https://user-images.githubusercontent.com/39804422/133917377-4e74d53b-3f17-4cc7-8443-2e7d2f9fdef4.mp4)
 
-## Usage
+## Simple Usage
 
 See `/example` folder for the sample.
 
@@ -27,3 +27,7 @@ GroupedExpansionTile<GroupBase>(
   builder: (parent, depth) => Text(parent.self.name),
 }
 ```
+
+## Advanced usage
+
+![Example-2](https://user-images.githubusercontent.com/39804422/133917379-fc9e0edc-03d6-4941-b7ad-428f7cf64166.mp4)
