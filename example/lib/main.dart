@@ -102,7 +102,6 @@ class GroupedExtensionTileSample extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Simplest"),
       ),
-      // body: groupedExpansionTile,
       body: groupedExpansionTile,
     );
   }
