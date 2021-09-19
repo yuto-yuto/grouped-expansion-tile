@@ -82,3 +82,7 @@ GroupedExpansionTile<Category>(
 ```
 
 <video autoplay="" controls="" loop="" muted="" preload="auto" src="https://user-images.githubusercontent.com/39804422/133917377-4e74d53b-3f17-4cc7-8443-2e7d2f9fdef4.mp4" width="240" height="426" > </video>
+
+## Known Issues
+
+- While dragging 3rd level item, top level item will accept the dragged item as long as dragged position is within the widget. It should accept the dragged item only while the dragged position is within collapsed parent area.
