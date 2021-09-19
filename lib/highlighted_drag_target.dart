@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_expansion_tile/drag_decoration.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
-import 'package:grouped_expansion_tile/model/boder_notifier.dart';
+import 'package:grouped_expansion_tile/model/top_parent_box_visible.dart';
 import 'package:grouped_expansion_tile/parent.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +41,7 @@ class HighlightedDragTarget<T extends GroupBase> extends StatefulWidget {
 
 class _HighlightedDragTarget<T extends GroupBase>
     extends State<HighlightedDragTarget<T>> {
-  late BorderNotifier notifier;
+  late Notifier<Border> notifier;
 
   @override
   void dispose() {
@@ -50,7 +50,7 @@ class _HighlightedDragTarget<T extends GroupBase>
 
   @override
   void initState() {
-    notifier = BorderNotifier(_createInitialBorder());
+    notifier = Notifier<Border>(_createInitialBorder());
     super.initState();
   }
 
@@ -70,12 +70,12 @@ class _HighlightedDragTarget<T extends GroupBase>
         if (!widget.onWillAccept(details.data)) {
           return;
         }
-        notifier.border = _createHighlightedBorder();
+        notifier.value = _createHighlightedBorder();
       },
-      onLeave: (source) => notifier.border = _createInitialBorder(),
+      onLeave: (source) => notifier.value = _createInitialBorder(),
       onWillAccept: widget.onWillAccept,
       onAccept: (source) {
-        notifier.border = _createInitialBorder();
+        notifier.value = _createInitialBorder();
         widget.onAccept?.call(source, widget.parent?.self);
       },
     );

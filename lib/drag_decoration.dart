@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:grouped_expansion_tile/model/boder_notifier.dart';
+import 'package:grouped_expansion_tile/model/top_parent_box_visible.dart';
 import 'package:provider/provider.dart';
 
 class DragDecoration extends StatelessWidget {
@@ -12,11 +12,11 @@ class DragDecoration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BorderNotifier>(
+    return Consumer<Notifier<Border>>(
       builder: (context, border, child) => decorateDraggable(
         context,
         this.child,
-        border.border,
+        border.value,
       ),
     );
   }

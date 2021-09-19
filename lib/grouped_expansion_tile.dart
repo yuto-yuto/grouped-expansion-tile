@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 
 export 'package:grouped_expansion_tile/group_base.dart';
 export 'package:grouped_expansion_tile/parent.dart';
+export 'package:grouped_expansion_tile/group_checker.dart';
 
 typedef WidgetBuilder<T extends GroupBase> = Widget Function(
   /// Item to show
@@ -252,7 +253,6 @@ class _GroupedExpansionTile<T extends GroupBase>
       builder: (context, idDragging, child) => Listener(
         child: listView,
         onPointerMove: (PointerMoveEvent event) {
-          print(_draggableNotifier.value);
           if (!_draggableNotifier.value) {
             return;
           }
