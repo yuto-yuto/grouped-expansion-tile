@@ -2,7 +2,7 @@
 
 This widget shows grouped data with expansion tile.
 
-[![Example-1](./assets/simplest-sample.PNG)](https://user-images.githubusercontent.com/39804422/133917377-4e74d53b-3f17-4cc7-8443-2e7d2f9fdef4.mp4)
+<video autoplay="" controls="" loop="" muted="" preload="auto" src="https://user-images.githubusercontent.com/39804422/133917377-4e74d53b-3f17-4cc7-8443-2e7d2f9fdef4.mp4" width="240" height="426" />
 
 
 
@@ -32,4 +32,4 @@ GroupedExpansionTile<GroupBase>(
 
 ## Advanced usage
 
-[![Example-2](./assets/advanced-sample.PNG)](https://user-images.githubusercontent.com/39804422/133917379-fc9e0edc-03d6-4941-b7ad-428f7cf64166.mp4)
+<video autoplay="" controls="" loop="" muted="" preload="auto" src="https://user-images.githubusercontent.com/39804422/133917379-fc9e0edc-03d6-4941-b7ad-428f7cf64166.mp4" width="240" height="426" />
