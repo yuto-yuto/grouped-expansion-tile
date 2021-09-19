@@ -168,7 +168,7 @@ class _GroupedExpansionTile<T extends GroupBase>
           child: widget.builder(parent, depth),
         ),
       );
-      
+
       return Draggable(
         data: parent,
         child: const Icon(Icons.dehaze_sharp),
@@ -252,6 +252,7 @@ class _GroupedExpansionTile<T extends GroupBase>
       builder: (context, idDragging, child) => Listener(
         child: listView,
         onPointerMove: (PointerMoveEvent event) {
+          print(_draggableNotifier.value);
           if (!_draggableNotifier.value) {
             return;
           }
@@ -283,13 +284,13 @@ class _GroupedExpansionTile<T extends GroupBase>
       onAccept: widget.onAccept,
     );
 
-    final topParentBoxProvider = ChangeNotifierProvider(
-      create: (context) => _topParentVisibleNotifier,
+    final topParentBoxProvider = ChangeNotifierProvider.value(
+      value: _topParentVisibleNotifier,
       builder: (context, widget) => topParentBox,
     );
 
-    return ChangeNotifierProvider(
-      create: (context) => _draggableNotifier,
+    return ChangeNotifierProvider.value(
+      value: _draggableNotifier,
       child: Column(
         children: [
           Expanded(child: listener),
