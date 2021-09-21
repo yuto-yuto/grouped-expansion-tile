@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:grouped_expansion_tile/model/top_parent_box_visible.dart';
+import 'package:grouped_expansion_tile/model/notifier.dart';
 import 'package:provider/provider.dart';
 
 class DragDecoration extends StatelessWidget {

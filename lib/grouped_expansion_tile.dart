@@ -4,7 +4,7 @@ import 'package:grouped_expansion_tile/drag_decoration.dart';
 import 'package:grouped_expansion_tile/group_base.dart';
 import 'package:grouped_expansion_tile/group_checker.dart';
 import 'package:grouped_expansion_tile/highlighted_drag_target.dart';
-import 'package:grouped_expansion_tile/model/top_parent_box_visible.dart';
+import 'package:grouped_expansion_tile/model/notifier.dart';
 import 'package:grouped_expansion_tile/parent.dart';
 import 'package:grouped_expansion_tile/top_parent_box.dart';
 import 'package:provider/provider.dart';
