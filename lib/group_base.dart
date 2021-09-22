@@ -1,4 +1,3 @@
-
 class GroupBase {
   final String uid;
   String? parent;
@@ -8,6 +7,7 @@ class GroupBase {
     this.parent,
   });
 
+  @override
   bool operator ==(Object other) {
     return other.runtimeType == runtimeType && hashCode == other.hashCode;
 
@@ -16,6 +16,5 @@ class GroupBase {
   }
 
   @override
-  int get hashCode =>
-      parent != null ? uid.hashCode + parent.hashCode : uid.hashCode;
+  int get hashCode => uid.hashCode + parent.hashCode;
 }
