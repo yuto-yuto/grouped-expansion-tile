@@ -19,5 +19,25 @@ void main() {
             "List must not contain the same uid.",
           )));
     });
+    test("should return empty list when data contains only child", () {
+      final data = [GroupBase(uid: "1", parent: "2")];
+      final result = createItemTree(data);
+      expect(result, isEmpty);
+    });
+    test("should return only top parents when they don't have child", () {
+      // final data = [
+      //   GroupBase(uid: "1"),
+      //   GroupBase(uid: "2"),
+      // ];
+      // final result = createItemTree(data);
+      // expect(result.length, 2);
+      // expect(result, [
+      //   Parent(self: GroupBase(uid: "1")),
+      //   Parent(self: GroupBase(uid: "2")),
+      // ]);
+      // expect(result[0].children, null);
+      // expect(result[0].self.uid, "1");
+      // expect(result[0].self.parent, );
+    });
   });
 }

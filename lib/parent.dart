@@ -8,4 +8,5 @@ class Parent<T extends GroupBase> {
     required this.self,
     this.children,
   });
+  
 }
